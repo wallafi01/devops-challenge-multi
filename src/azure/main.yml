@@ -1,0 +1,56 @@
+name: 'Bicep Unit Tests'
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  LOCATION: "eastus"
+
+permissions:
+  id-token: write
+  contents: read
+  security-events: write
+
+jobs:
+  bicep-unit-tests:
+    name: 'Bicep Unit Tests'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Authenticate to Az CLI using OIDC
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Plan
+        run: terraform validate
+
+      - name: Terraform apply
+        run: terraform apply --auto-approve
+
+      - name: Get Public IP Address
+        id: get_public_ip
+        run: echo "::set-output name=public_ip::$(terraform output public_ip_address)"
+
+      - name: Display Public IP Address
+        run: |
+          echo "Public IP Address: ${{ steps.get_public_ip.outputs.public_ip }}"
+
+      - name: Install Nginx on Azure VM
+        run: |
+          PUBLIC_IP=$(terraform output public_ip_address)
+          ssh -o StrictHostKeyChecking=no adminuser@$PUBLIC_IP 'sudo apt-get update && sudo apt-get install -y nginx'

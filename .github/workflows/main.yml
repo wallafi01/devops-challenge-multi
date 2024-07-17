@@ -1,0 +1,33 @@
+name: Choose Infrastructure Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Choose the infrastructure environment to deploy'
+        required: true
+        default: 'aws'
+        options:
+          - 'azure'
+          - 'gcp'
+          - 'aws'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Choose deployment environment
+        run: echo "Deploying infrastructure to ${{ github.event.inputs.environment }} environment"
+
+      - name: Run selected deployment
+        if: ${{ github.event.inputs.environment == 'azure' }}
+        uses: ./.github/workflows/azure/main.yml
+
+      - name: Run selected deployment
+        if: ${{ github.event.inputs.environment == 'gcp' }}
+        uses: ./.github/workflows/gcp/main.yml
+
+      - name: Run selected deployment
+        if: ${{ github.event.inputs.environment == 'aws' }}
+        uses: ./.github/workflows/aws/1-apply-infra.yaml
