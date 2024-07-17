@@ -19,6 +19,9 @@ jobs:
     steps:
       - name: Choose deployment environment
         run: echo "Deploying infrastructure to ${{ github.event.inputs.environment }} environment"
+        
+      - name: Checkout repository
+        uses: actions/checkout@v2        
 
       - name: Run selected deployment
         if: ${{ github.event.inputs.environment == 'azure' }}
