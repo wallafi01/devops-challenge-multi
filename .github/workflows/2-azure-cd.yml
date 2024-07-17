@@ -1,4 +1,4 @@
-name: Apply Azure Infrastructure
+name: 2-Apply-Azure
 
 on:
   release:

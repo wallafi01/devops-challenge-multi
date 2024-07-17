@@ -1,4 +1,4 @@
-name: Apply-infra
+name: 1-Apply-infra-AWS
 
 on:
   release:

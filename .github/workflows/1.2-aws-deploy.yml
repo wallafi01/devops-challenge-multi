@@ -1,8 +1,8 @@
-name: Deploy-infra
+name: 1.3-Deploy-infra-AWS
 
 on:
   workflow_run:
-    workflows: [Install-infra]
+    workflows: [1.1-Install-infra-AWS]
     types:
       - completed
 
