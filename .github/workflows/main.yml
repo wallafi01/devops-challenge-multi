@@ -33,4 +33,4 @@ jobs:
 
       - name: Run selected deployment
         if: ${{ github.event.inputs.environment == 'aws' }}
-        uses: wallafi01/devops-challenge-multi/.github/workflows/aws/1-apply-infra.yaml@main
+        uses: ./.github/workflows/aws/1-apply-infra.yml
