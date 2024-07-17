@@ -1,7 +1,13 @@
 name: Apply GCP Infrastructure
 
 on:
+  release:
+    types:
+      - created
   workflow_dispatch:
+#   push:
+#     branches:
+#       - main  
 env:
   GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
 

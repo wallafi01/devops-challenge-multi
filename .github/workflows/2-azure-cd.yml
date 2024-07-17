@@ -1,18 +1,17 @@
 name: Apply Azure Infrastructure
 
 on:
+  release:
+    types:
+      - created
   workflow_dispatch:
-env:
-  LOCATION: "centralus"
-
-permissions:
-  id-token: write
-  contents: read
-  security-events: write
+#   push:
+#     branches:
+#       - main  
 
 jobs:
   apply-deploy:
-    name: 'Bicep Unit Tests'
+    name: 'Apply iNfra Azure'
     runs-on: ubuntu-latest
     
     steps:
