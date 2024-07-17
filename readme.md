@@ -14,10 +14,14 @@ A infraestrutura será criada pelo Terraform e o AWS CodeDeploy será responsáv
  
 - Github
 - GitHub Actions
+- AWS
+- AZURE
+- GCP
 - Terraform
 - CodeDeploy
+- SSM Agennt
 - CodePipeline
-- Ansible
+
 
 ## Diagrama da Solução
 
@@ -26,99 +30,54 @@ A infraestrutura será criada pelo Terraform e o AWS CodeDeploy será responsáv
 
 ## Instruções
 
-## 1 - Configurações iniciais
+## 1 - INSTRUÇÕES PIPELINE AWS
 
-**1.** Para começar, é essencial ter acesso à plataforma AWS para gerenciar seus recursos na nuvem de forma eficiente.
+**PROVEDOR AWS**
 
-**2.** Crie um usuário na AWS e gere "Secret Keys" para acesso seguro aos recursos AWS via linha de comando. É recomendado não compartilhar essas "Secret Keys" para manter a segurança dos seus dados.
+  workflow configura e aplica a infraestrutura na AWS utilizando Terraform
+
+  ![alt text](./images/Screenshot_31.png)
+
+  Irá conter arquivos:
+
+  - 1   -aws-apply.yml    - Fará o Deploy da Infraestrutura
+  - 1.1 -aws-install.yml  - instalara as configurações servidor
+  - 1.2 -aws-deploy.yml   - realizara o deploy no servidor
+  - 1.3 -aws-destroy.yml  - ira desfazer toda a infraestrtura
+
+
+
+**1. Para começar, é essencial ter acesso à plataforma AWS para gerenciar seus recursos na nuvem de forma eficiente.**
+
+**2. Crie um usuário na AWS e gere "Secret Keys" para acesso seguro aos recursos AWS via linha de comando. É recomendado não compartilhar essas "Secret Keys" para manter a segurança dos seus dados.**
 
     - Selecione as políticas apropriadas, como AmazonEC2FullAccess, AmazonVPCFullAccess, AmazonCodeDeployFullAccess ou crie uma política personalizada com as permissões necessárias para seu projeto.
 
-**3.** Criar um Bucket que servirá como um backend e armazenara o arquivo terraform.state gerado
+**3.Criar um Bucket que servirá como um backend e armazenara o arquivo terraform.state gerado**
   ![alt text](./images/Screenshot_20.png)
 
-
-**4. Configurar as variaveis para o Deploy na infraestrutra no arquivo ./src/variables.tf**
-
-  ![alt text](./images/Screenshot_18.png)
-
-  - Observação : Por questões de segurança e recomendado criar a chave .pem na qual será para o acesso a EC2 ,diretamente na console e adicionar o nome da chave no campo variable "key_pair".
-
-**5. Configurar as variaveis e Secrets para o funcionamento da Pipeline no arquivo ./github/workflows/main.yaml**  
-
-**Etapa 1 - Deploy da Infraestrtura com Trerraform**
-
-    - Objetivo desta etapa e a implantação de uma Infra AWS ,contendo EC2 , S3 , VPC e CodeDeploy.
-
-  ![alt text](./images/Screenshot_21.png) 
-  ![alt text](./images/Screenshot_22.png)
-
- - No repositorio > Settings > Security (Secrets and variabels) > actions > Secrets : Repository Secrets > New Repository Secrets , adicionar todas as secrets selecionadas.
+  
+  
+**4. No repositorio Certifique-se de que os secrets estão corretamente configurados no seu repositório GitHub:**
 
  - **AWS_ACCESS_KEY_ID  / AWS_SECRET_ACCESS_KEY**  - Chaves programaticas geradas na console na etapa incial.
  - **AWS_BUCKET_NAME** - Nome do bucket criado na console , para gerenciar o estado do terraform.
  - **AWS_BUCKET_FILE** - Nome do arquivo gerado pelo terraform (ex: terraform.tfstate).
- 
-**Etapa 2 - Informações da EC2:**
-
-    - Objetivo desta etapa e obter as informações da ec2 como o IP público para o ansible acessa-lá.
-
-  ![alt text](./images/Screenshot_25.png)   
-
-  - No repositorio > Settings > Security (Secrets and variabels) > actions > variables >  Repository variables > New Reposiroty Secrets , adicionar a variavel abaixo .
-
- - **NAME_EC2** - Deverá conter o mesmo nome da instancia , implantada pelo terraform conforme abaixo no arquivo ./src/variables.tf.
-
-  ![alt text](./images/Screenshot_29.png)    
-
-**Etapa 3 - Provisionamento com Ansible:**
-
-    - Objetivo desta etapa e instalar o Agent do Code Deploy na ec2.
-
-  ![alt text](./images/Screenshot_24.png)
-
- - **SSH_PRIVATE_KEY**  - Adicionar o conteudo da chave ".pem" criada na console para o ansible conseguir acessar o servidor.
 
 
-**Etapa 4 - Deploy com CodeDeploy:**
 
-    - Nesta etapa o CodeDeploy irá realizar a implantação na EC2.
+**5. Configurar as variaveis para o Deploy na infraestrutra no arquivo ./src/aws/variables.tf**
 
+  ![alt text](./images/Screenshot_18.png)
 
-  ![alt text](./images/Screenshot_26.png)  
-
-
- - **AWS_BUCKET_DEPLOY_NAME**  - Adicionar na Secrets , o nome do bucket que irá receber os Artiacts do CodeDeploy , o nome deverá ser o mesmo que foi definido no terraform .
- - **NAME_APP / NAME_GROUP** - Adicionar como variaveis , o o nome deverá ser o mesmo que foi definido no terraform conforme abaixo:
-
-  ![alt text](./images/Screenshot_27.png)
-
-- **SOURCE_PATH: ./deploy** - Adicionar o path que contenha o appspec.yml e os scripts.
-
-  ![alt text](./images/Screenshot_28.png)
-
-**5. Configurando appsec.yml**
-
-  - Nesta etapa o CodeDeploy irá realizar a implantação na EC2.
-
-  
-  - O arquivo appspec.yml , localizado ./deploy do repositorio informará ao CodeDeploy  os comandos que você deseja executar durante a implantação
-
-  ![alt text](./images/Screenshot_16.png)  
+  - Observação : Por questões de segurança e recomendado criar a chave .pem na propria console da AWS e apenas referenciar o nome da chave no campo **variable "key_pair"**.
 
 
-  **Scripts:**
+**6 - Criação CodePipeline:**
 
-  Serão responsavel por inicializar servidor Nginx e implantar a aplicação
+  - Nesta etapa iremos criar o CodePipeline , para realizar a integração do Repositorio juntamente ao CodeDeploy.
 
-  Gerar um token do repositorio , e criar uma secrets no repositorio com nome "token_git" e adicionaro token
-
-  ![alt text](./images/Screenshot_19.png)   
-
-**Etapa 6 - Criação CodePipeline:**
-
-    - Nesta etapa o iremos criar o CodePipeline , para realizar a integração do Repositorio juntamente ao CodeDeploy.
-    - Observação: A criação da ferramenta será via console , poís será preciso realizar autenticação juntamente ao GitHub.
+  - Observação: A criação da ferramenta será via console , poís será preciso realizar autenticação juntamente ao GitHub.
 
   ir em Code Pipeline > criar Pipeline.
 
@@ -141,37 +100,114 @@ A infraestrutura será criada pelo Terraform e o AWS CodeDeploy será responsáv
 
   ![alt text](./images/Screenshot_10.png)
 
-  Proximo , revisar e criar pipeline  .
+  Proximo , revisar e criar pipeline  .  
 
+**7. Acionar a Pipeline**
 
-## 2 - Executando a Pipeline
+  - **Observação:** Primeiramente garantir se todas as etapas de configuração acima foram executadas e revisadas.
 
-**1. Primeiramente garantir se todas as etapas de configuração acima foram executadas**
-
-**2. Preparar o diisparo do GitHub Actions (Trigger)**
-
-- GitHub Actions é configurado para monitorar o repositório em busca de alterações no branch principal(main).
-- Descomentar o bloco abaixo que esta presente em .github/workflows/main.yaml e salvar.
+  - Preparar o disparo do GitHub Actions (Trigger)
+  - Descomentar o bloco abaixo que esta presente em .github/workflows/1.1-aws-deploy.yml e salvar.
 
 ![alt text](./images/Screenshot_30.png)
 
-
-**3. Realizar um Push no repositorio**
-- Ao realizar alguma alteração a Pipeline será disparada ,executando etapa por etapa conforme esta no arquivo main.yml
+  - Realizar um Push no repositorio a partir de alguma alteração , piepeline será disparada
 
 
+## 1 - INSTRUÇÕES PIPELINE AZURE
+
+**PROVEDOR AZURE**
+
+  workflow configura e aplica a infraestrutura na AZURE utilizando Terraform
+
+  Irá conter arquivos:
+
+  ![alt text](./images/Screenshot_32.png)  
+
+  - 2-azure-cd.yml    - Fará o Deploy da Infraestrutura e configurações no servidor
+
+**1. Para começar, é essencial ter acesso à plataforma AZURE para gerenciar seus recursos na nuvem de forma eficiente.**
+
+**2. Seguir o passo a passo conforme a documentação oficial da Microsoft para criação das credenciais e assinatura**
+
+<a href="https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-cli%2Clinux#use-the-azure-login-action-with-openid-connect">Conectando Github Actions na Azure</a>
+
+<a href="https://learn.microsoft.com/en-us/devops/deliver/iac-github-actions#architecturet">Criando as credeneciais </a>
+
+**3. No repositorio Certifique-se de que os secrets estão corretamente configurados no seu repositório GitHub:**
+
+ - **AZURE_CLIENT_ID  / AZURE_CLIENT_ID**  - Chaves programaticas geradas na console na etapa incial.
+ - **AZURE_SUBSCRIPTION_ID** - ID da assinatura
 
 
+**4. Configurar as variaveis para o Deploy na infraestrutra no arquivo ./src/azure/variables.tf**
+
+  ![alt text](./images/Screenshot_33.png)
+
+**5. Acionar a Pipeline**
+
+  - **Observação:** Primeiramente garantir se todas as etapas de configuração acima foram executadas e revisadas.
+
+  - Preparar o disparo do GitHub Actions (Trigger)
+  - Descomentar o bloco abaixo que esta presente em .github/workflows/1.1-aws-deploy.yml e salvar.
+
+![alt text](./images/Screenshot_30.png)
+
+  - Realizar um Push no repositorio a partir de alguma alteração , piepeline será disparada  
+
+## 1 - INSTRUÇÕES PIPELINE GCP
+
+**PROVEDOR GCP**
+
+  workflow configura e aplica a infraestrutura na AZURE utilizando Terraform
+
+  Irá conter arquivos:
+
+  ![alt text](./images/Screenshot_34.png)  
+
+  - 3-gcp-cd.yml    - Fará o Deploy da Infraestrutura e configurações no servidor  
+
+**1. Para começar, é essencial ter acesso à plataforma AZURE para gerenciar seus recursos na nuvem de forma eficiente.**  
 
 
+**2. Obter o GOOGLE_PROJECT_ID**
+
+1. O GOOGLE_PROJECT_ID é o identificador único do seu projeto na GCP. Para obtê-lo:
+
+- Acesse o Console do Google Cloud No menu de navegação, clique em "Select a project" (Selecionar um projeto).
+- Encontre o seu projeto na lista e copie o Project ID (ID do projeto).
+
+2. Criar e Obter as Credenciais de Serviço (GOOGLE_CREDENTIALS)
+Para criar e obter um arquivo de chave JSON para as credenciais de serviço:
+
+3. No Console do Google Cloud, vá para "IAM & Admin" > "Service Accounts" (Contas de Serviço) clicar em Criar Conta de Serviço.
+
+- Preencha o nome da conta de serviço e, opcionalmente, uma descrição. Clique em "Create" (Criar).
+- Na seção "Service account permissions" (Permissões da conta de serviço), atribua as permissões necessárias para a conta de serviço. Isso geralmente será algo como "Editor" ou qualquer outro papel que você precisar. Clique em "Continue" (Continuar).
+- Na seção "Grant users access to this service account" (Conceder acesso a esta conta de serviço), você pode pular este passo. Clique em "Done" (Concluído).
+- Na lista de contas de serviço, encontre a conta de serviço que você acabou de criar. Clique no botão de menu (três pontos) na extremidade direita da linha e selecione "Create key" (Criar chave).
+- Escolha o formato de chave como JSON e clique em "Create" (Criar). O arquivo JSON será baixado automaticamente.
 
 
+**4. No repositorio Certifique-se de que os secrets estão corretamente configurados no seu repositório GitHub:**
+
+ - **GOOGLE_PROJECT_ID / GOOGLE_CREDENTIALS**  - Chaves programaticas geradas na console na etapa incial.
 
 
+**5. Configurar as variaveis para o Deploy na infraestrutra no arquivo ./src/gcp/variable.tf**
 
+  ![alt text](./images/Screenshot_35.png)
 
+**6. Acionar a Pipeline**
 
+  - **Observação:** Primeiramente garantir se todas as etapas de configuração acima foram executadas e revisadas.
 
+  - Preparar o disparo do GitHub Actions (Trigger)
+  - Descomentar o bloco abaixo que esta presente em .github/workflows/1.1-aws-deploy.yml e salvar.
+
+![alt text](./images/Screenshot_30.png)
+
+  - Realizar um Push no repositorio a partir de alguma alteração , piepeline será disparada   
 
 
 

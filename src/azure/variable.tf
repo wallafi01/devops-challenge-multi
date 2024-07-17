@@ -4,6 +4,6 @@ variable "prefix" {
 }
 
 variable "location" {
-  description = "eastus"
+  description = "centralus"
   default = "centralus"
 } 

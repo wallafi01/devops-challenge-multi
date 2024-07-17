@@ -1,7 +1,3 @@
-variable "project_id" {
-    type = string
-    default = "gcp-challenge"
-}
 
 locals {
   project_id = var.project_id
