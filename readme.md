@@ -3,11 +3,22 @@
 ## Descrição
 
 
-O processo de automação CI/CD na AWS EC2, através de uma pipeline integrada com GitHub Actions, será composto pelo AWS CodePipeline e AWS CodeDeploy. Esse processo será iniciado automaticamente após commits e push no repositório GitHub.
+**IPipeline CI/CD Automatizada AWS Azure e Google Cloud Platform (GCP)**
 
-GitHub Actions será configurado para disparar automaticamente em push para o branch principal, acionando o início do pipeline. O AWS CodePipeline integrará o repositório GitHub com o AWS CodeDeploy, coordenando todo o fluxo de entrega contínua.
+A integração multicloud aumenta a resiliência e disponibilidade do sistema, permitindo atualizações rápidas e eficientes em AWS, Azure e GCP.
 
-A infraestrutura será criada pelo Terraform e o AWS CodeDeploy será responsável por automatizar o deployment na instância EC2, garantindo a eficiência e a confiabilidade no processo de atualização contínua da aplicação. Com essa configuração, o processo de deployment se torna mais ágil e seguro, minimizando riscos e reduzindo o tempo de inatividade.
+**AWS:**
+  - Uma instância EC2 será provisionada e gerenciada via Terraform.
+  - Deploy automatizado usando AWS CodeDeploy.
+  - CodePipeline integrará o repositório GitHub com CodeDeploy, coordenando o fluxo de entrega contínua.
+
+**Azure:**
+  - Uma VM será provisionada e gerenciada via Terraform.
+  - Deploy automatizado usando  GitHub Actions, com scripts para instalação e atualização da aplicação.
+
+**GCP:**
+- Uma VM será provisionada e gerenciada via Terraform.
+- Deploy automatizado usando Google Cloud Build ou GitHub Actions, com scripts para instalação e atualização da aplicação.
 
 
 ### Tecnologias Utilizadas
@@ -19,7 +30,7 @@ A infraestrutura será criada pelo Terraform e o AWS CodeDeploy será responsáv
 - GCP
 - Terraform
 - CodeDeploy
-- SSM Agennt
+- SSM Agent
 - CodePipeline
 
 
