@@ -33,4 +33,5 @@ jobs:
 
       - name: Run selected deployment
         if: ${{ github.event.inputs.environment == 'aws' }}
-        uses: ./.github/workflows/aws/1-apply-infra.yaml
+        run: |
+          cd ./.github/workflows/aws  # Entrar no diretório correto
