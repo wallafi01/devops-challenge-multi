@@ -25,12 +25,18 @@ jobs:
 
       - name: Deploy Azure
         if: ${{ github.event.inputs.environment == 'azure' }}
-        uses: ./.github/workflows/azure-main.yml
+        run: |
+          echo "Running Azure deployment"
+          gh workflow run azure-main.yml
 
       - name: Deploy GCP
         if: ${{ github.event.inputs.environment == 'gcp' }}
-        uses: ./.github/workflows/gcp-main.yml
+        run: |
+          echo "Running GCP deployment"
+          gh workflow run gcp-main.yml
 
       - name: Deploy AWS
         if: ${{ github.event.inputs.environment == 'aws' }}
-        uses: ./.github/workflows/aws-apply.yml
+        run: |
+          echo "Running AWS deployment"
+          gh workflow run aws-apply.yml
