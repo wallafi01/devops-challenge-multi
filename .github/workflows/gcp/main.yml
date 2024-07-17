@@ -11,7 +11,7 @@ env:
 
 jobs:
   apply-cd:
-    name: Terraform Deployment
+    name: Terraform Deployment 
     runs-on: ubuntu-latest
 
     steps:
