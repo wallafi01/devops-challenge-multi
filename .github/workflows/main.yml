@@ -1,4 +1,4 @@
-name: Choose Infrastructure Deployment
+name: Escolha um provedor
 
 on:
   workflow_dispatch:
