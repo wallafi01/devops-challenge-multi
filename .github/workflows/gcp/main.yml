@@ -1,11 +1,10 @@
 name: Deploy Terraform on GCP
 
-on:
-  # push:
-  #   branches:
-  #     - main
-  workflow_dispatch:
-
+workflow_call:
+  inputs:
+    environment:
+      required: true
+      type: string
 env:
   GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
 
