@@ -37,7 +37,7 @@ A integração multicloud aumenta a resiliência e disponibilidade do sistema, p
 ## Diagrama da Solução
 
 
-  ![alt text](./diagrama/pipeline.drawio.png)
+  ![alt text](./diagrama/pipeline2.png)
 
 ## Instruções
 
