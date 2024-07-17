@@ -1,4 +1,4 @@
-name: Deploy Terraform on GCP
+name: Selecione o provedor
 
 on:
   # push:
