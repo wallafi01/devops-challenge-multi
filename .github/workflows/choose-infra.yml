@@ -1,11 +1,11 @@
-name: Escolha um provedor
+name: Choose Infrastructure Deployment
 
 on:
   workflow_dispatch:
     inputs:
       environment:
         type: choice
-        description: 'Esolha um provedor'
+        description: 'Choose the infrastructure environment to deploy'
         required: true
         default: 'aws'
         options:
@@ -17,20 +17,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Choose deployment environment
         run: echo "Deploying infrastructure to ${{ github.event.inputs.environment }} environment"
-        
-      - name: Checkout repository
-        uses: actions/checkout@v2        
 
-      - name: Run selected deployment
+      - name: Deploy Azure
         if: ${{ github.event.inputs.environment == 'azure' }}
-        uses: ./.github/workflows/azure/main.yml
+        uses: ./.github/workflows/azure-main.yml
 
-      - name: Run selected deployment
+      - name: Deploy GCP
         if: ${{ github.event.inputs.environment == 'gcp' }}
-        uses: ./.github/workflows/gcp/main.yml
+        uses: ./.github/workflows/gcp-main.yml
 
-      - name: Run selected deployment
+      - name: Deploy AWS
         if: ${{ github.event.inputs.environment == 'aws' }}
-        uses: ./.github/workflows/aws/1-apply.yml
+        uses: ./.github/workflows/aws-apply.yml

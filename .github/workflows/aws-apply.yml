@@ -1,11 +1,7 @@
 name: Apply-infra
 
 on:
-  workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
+  workflow_dispatch:
 
 jobs:
   apply-infra:

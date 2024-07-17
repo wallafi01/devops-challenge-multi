@@ -1,10 +1,7 @@
-name: Deploy Terraform on GCP
+name: Apply GCP Infrastructure
 
-workflow_call:
-  inputs:
-    environment:
-      required: true
-      type: string
+on:
+  workflow_dispatch:
 env:
   GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
 
