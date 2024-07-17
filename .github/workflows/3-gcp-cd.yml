@@ -1,4 +1,4 @@
-name: "Apply-gcp"
+name: "3-Apply-gcp"
 
 on:
   release:
